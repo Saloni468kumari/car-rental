@@ -36,7 +36,7 @@ const Login = () => {
       }
     } catch (error) {
       // ❌ Unexpected error (like network issues)
-      toast.error(error.message);
+      toast.error(error.response?.data?.message || error.message);
     }
   };
 
@@ -96,6 +96,7 @@ const Login = () => {
             placeholder="Enter your password"
             className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
             required
+            minLength="8"
           />
         </div>
 
