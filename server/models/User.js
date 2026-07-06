@@ -1,27 +1,47 @@
 import mongoose from "mongoose";
 
-// Define the User schema
-const userSchema = new mongoose.Schema({
-    // User's full name
+const userSchema = new mongoose.Schema(
+  {
     name: { type: String, required: true },
 
-    // Email must be unique
     email: { type: String, required: true, unique: true },
 
-    // Hashed password
-    password: { type: String, required: true },
+    password: {
+      type: String,
+      required: function () {
+        return this.provider === "local";
+      },
+    },
 
-    // Role can be either "user" or "owner", default is "user"
-    role: { type: String, enum: ["owner", "user"], default: 'user' },
+    // Google user ki unique ID
+    googleId: {
+      type: String,
+      default: null,
+    },
 
-    // Profile image URL
-    image: { type: String, default: '' },
-}, 
-{
-    timestamps: true  // Automatically adds createdAt and updatedAt
-});
+    // Kis provider se login hua
+    provider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
+    },
 
-// Create the User model
-const User = mongoose.model('User', userSchema);
+    role: {
+      type: String,
+      enum: ["owner", "user"],
+      default: "user",
+    },
+
+    image: {
+      type: String,
+      default: "",
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const User = mongoose.model("User", userSchema);
 
 export default User;

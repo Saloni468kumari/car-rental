@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
 
+import { GoogleLogin } from "@react-oauth/google";
+
 const Login = () => {
   // Get values & functions from AppContext
   const { setShowLogin, axios, setToken, navigate } = useAppContext();
@@ -38,6 +40,28 @@ const Login = () => {
       // ❌ Unexpected error (like network issues)
       toast.error(error.response?.data?.message || error.message);
     }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const { data } = await axios.post("/api/user/google-login", {
+        credential: credentialResponse.credential,
+      });
+
+      if (data.success) {
+        localStorage.setItem("token", data.token);
+        setToken(data.token);
+        setShowLogin(false);
+        navigate("/");
+        toast.success("Login Successful");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Google Login Failed");
+    }
+  };
+
+  const handleGoogleError = () => {
+    toast.error("Google Login Failed");
   };
 
   return (
@@ -106,9 +130,7 @@ const Login = () => {
             ? "Already have an account? "
             : "Create an account? "}
           <span
-            onClick={() =>
-              setState(state === "login" ? "register" : "login")
-            }
+            onClick={() => setState(state === "login" ? "register" : "login")}
             className="text-blue-600 cursor-pointer font-medium"
           >
             Click here
@@ -122,6 +144,22 @@ const Login = () => {
         >
           {state === "register" ? "Create Account" : "Login"}
         </button>
+
+        <div className="flex items-center my-2">
+          <div className="flex-1 border-t"></div>
+          <span className="px-3 text-gray-500 text-sm">OR</span>
+          <div className="flex-1 border-t"></div>
+        </div>
+
+        <div className="flex justify-center">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleError}
+            theme="outline"
+            size="large"
+            width="320"
+          />
+        </div>
       </form>
     </div>
   );

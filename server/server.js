@@ -17,7 +17,11 @@ app.use(express.json());
 
 // Updated CORS
 app.use(cors({
-    origin: "https://car-rental-client-one.vercel.app",
+    origin: [
+        "http://localhost:5173",
+        "https://car-rental-client-one.vercel.app"
+    ],
+
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
 }));

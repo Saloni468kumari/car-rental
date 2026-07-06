@@ -68,7 +68,8 @@ export const AppProvider = ({ children }) => {
     // When token changes → fetch user
     useEffect(() => {
         if (token) {
-            axios.defaults.headers.common['Authorization'] = `${token}`
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+
             fetchUser()
         }
     }, [token])
