@@ -1,0 +1,98 @@
+🚀 Google Authentication (OAuth 2.0) – Project Explanation
+1. What I built
+-> I integrated Google OAuth 2.0 authentication into my Car Rental web application to allow users to securely sign in using their Google account instead of manually registering with email and password.
+
+2. Why I used it
+    To improve user experience (faster login)
+    To avoid password fatigue
+    To implement secure authentication without storing passwords
+    To support modern social login flow
+
+3. How it works (Flow)
+Step 1: Frontend login
+User clicks “Login with Google” button.
+
+Step 2: Google authentication
+Google handles login and returns a credential (JWT token).
+
+Step 3: Backend verification
+Backend verifies the token using:
+
+google-auth-library
+Google Client ID
+const ticket = await client.verifyIdToken({
+  idToken: credential,
+  audience: process.env.GOOGLE_CLIENT_ID,
+});
+
+Step 4: Extract user data
+From Google payload:
+
+name
+email
+profile picture
+googleId
+Step 5: User handling logic
+let user = await User.findOne({ email });
+
+if (!user) {
+  user = await User.create({
+    name,
+    email,
+    image: picture,
+    googleId,
+    provider: "google",
+  });
+}
+
+✔ If user doesn’t exist → create account automatically
+✔ If exists → reuse same account
+
+Step 6: JWT token generation
+After successful login:
+
+const token = jwt.sign(
+  { id: user._id, role: user.role },
+  process.env.JWT_SECRET,
+  { expiresIn: "7d" }
+);
+
+This token is used for authentication in protected routes.
+
+Step 7: Response to frontend
+res.json({
+  success: true,
+  token,
+  user,
+});
+
+Frontend stores token and maintains login session.
+
+4. Key features implemented
+Google OAuth 2.0 login
+Automatic user creation (first-time login)
+Account linking with existing users
+JWT-based authentication
+Secure backend verification of Google token
+
+5. Security measures
+Google token verified on backend (not frontend trusted)
+JWT signed with secret key
+Passwords not required for Google users
+Provider tracking (local vs google)
+
+6. Challenges I solved
+Handled case where Google user logs in without existing account
+Linked existing users with Google accounts using email
+Prevented password login for Google-auth users
+Managed token verification securely
+
+7. Result
+Now users can:
+Login with Google in one click
+Avoid registration forms
+Get instant account access
+Have secure session-based authentication
+
+🎯 Short Interview Version (30 seconds)
+“I implemented Google OAuth 2.0 login in my Car Rental app using google-auth-library. The backend verifies Google’s ID token, extracts user info, and either creates a new user or logs in an existing one. Then I generate a JWT token for session management. This improves UX by allowing one-click secure login without passwords.”

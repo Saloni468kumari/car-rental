@@ -24,3 +24,4 @@ cd ../server && npm install
 # Start development
 cd server && npm run server
 cd client && npm run dev
+
